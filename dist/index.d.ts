@@ -74,4 +74,9 @@ interface ErrorResponse {
 }
 declare const errorToResponse: (error: unknown) => Response;
 
-export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, allowed, errorToResponse, get, ip, isObject, merge, parseJSON, prune, retry, sleep, update, validate };
+type Locale = Record<string, Record<string, string>>;
+type Locales = Record<string, Locale>;
+declare function getLocale(locales: Locales, lang: string, callback?: Locale): Locale;
+declare function translate(locale: Locale, key: string, params?: Record<string, string | number>): any;
+
+export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, merge, parseJSON, prune, retry, sleep, translate, update, validate };

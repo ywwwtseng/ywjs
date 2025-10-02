@@ -239,12 +239,28 @@ var errorToResponse = (error) => {
     { status }
   );
 };
+
+// src/i18n.ts
+function getLocale(locales, lang, callback) {
+  lang = lang.slice(0, 2);
+  return locales[lang] || callback;
+}
+function translate(locale, key, params) {
+  if (!locale || typeof key !== "string") return key;
+  const template = get(locale, key, key);
+  if (!params) return template;
+  return template.replace(
+    /\{(\w+)\}/g,
+    (_, key2) => String(params[key2]) || ""
+  );
+}
 export {
   AppError,
   ErrorCodes,
   allowed,
   errorToResponse,
   get,
+  getLocale,
   ip,
   isObject,
   merge,
@@ -252,6 +268,7 @@ export {
   prune,
   retry,
   sleep,
+  translate,
   update,
   validate
 };
