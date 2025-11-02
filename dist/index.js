@@ -112,6 +112,40 @@ var AppError = class extends Error {
   }
   cause;
 };
+var parseError = (error) => {
+  let error_code = 50001;
+  let status = 500;
+  let message = "Unknown error";
+  let info = void 0;
+  if (error !== null && typeof error === "object") {
+    if ("status" in error) {
+      if (typeof error.status === "number") {
+        status = error.status;
+      }
+    }
+    if ("message" in error && typeof error.message === "string") {
+      message = error.message;
+    } else {
+      message = JSON.stringify(error);
+    }
+    if ("cause" in error) {
+      if (typeof error.cause === "object") {
+        if ("code" in error.cause && typeof error.cause.code === "number") {
+          error_code = error.cause.code;
+        }
+        if ("info" in error.cause && error.cause.info) {
+          info = error.cause.info;
+        }
+      }
+    }
+  }
+  return {
+    error_code,
+    status,
+    message,
+    info
+  };
+};
 
 // src/ip.ts
 var ip = (headers) => {
@@ -203,32 +237,7 @@ var allowed = (params, schema) => {
 
 // src/response.ts
 var errorToResponse = (error) => {
-  let error_code = 50001;
-  let status = 500;
-  let message = "Unknown error";
-  let info = void 0;
-  if (error !== null && typeof error === "object") {
-    if ("status" in error) {
-      if (typeof error.status === "number") {
-        status = error.status;
-      }
-    }
-    if ("message" in error && typeof error.message === "string") {
-      message = error.message;
-    } else {
-      message = JSON.stringify(error);
-    }
-    if ("cause" in error) {
-      if (typeof error.cause === "object") {
-        if ("code" in error.cause && typeof error.cause.code === "number") {
-          error_code = error.cause.code;
-        }
-        if ("info" in error.cause && error.cause.info) {
-          info = error.cause.info;
-        }
-      }
-    }
-  }
+  const { error_code, status, message, info } = parseError(error);
   return Response.json(
     {
       error,
@@ -264,6 +273,7 @@ export {
   ip,
   isObject,
   merge,
+  parseError,
   parseJSON,
   prune,
   retry,

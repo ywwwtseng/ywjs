@@ -41,6 +41,12 @@ declare class AppError extends Error {
     };
     constructor(code: number, message: string, info?: Record<string, unknown>, status?: number);
 }
+declare const parseError: (error: unknown) => {
+    error_code: number;
+    status: number;
+    message: string;
+    info: any;
+};
 
 declare const ip: (headers: Headers) => string;
 
@@ -79,4 +85,4 @@ type Locales = Record<string, Locale>;
 declare function getLocale(locales: Locales, lang: string, callback?: Locale): Locale;
 declare function translate(locale: Locale, key: string, params?: Record<string, string | number>): any;
 
-export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, merge, parseJSON, prune, retry, sleep, translate, update, validate };
+export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };
