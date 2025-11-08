@@ -263,6 +263,19 @@ function translate(locale, key, params) {
     (_, key2) => String(params[key2]) || ""
   );
 }
+
+// src/loaders.ts
+async function loadImage(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      return null;
+    }
+    return await res.blob();
+  } catch (error) {
+    return null;
+  }
+}
 export {
   AppError,
   ErrorCodes,
@@ -272,6 +285,7 @@ export {
   getLocale,
   ip,
   isObject,
+  loadImage,
   merge,
   parseError,
   parseJSON,

@@ -85,4 +85,6 @@ type Locales = Record<string, Locale>;
 declare function getLocale(locales: Locales, lang: string, callback?: Locale): Locale;
 declare function translate(locale: Locale, key: string, params?: Record<string, string | number>): any;
 
-export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };
+declare function loadImage(url: string): Promise<Blob | null>;
+
+export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, loadImage, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };
