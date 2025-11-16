@@ -189,6 +189,9 @@ var validate = (params, schema) => {
         error: `Parameter (${key}) is required`
       };
     } else if (!(schema[key].nullable && params[key] === null) && !(!schema[key].required && params[key] === void 0) && schema[key].type !== "enum" && typeof params[key] !== schema[key].type) {
+      if (schema[key].nullable && params[key] === null) {
+        continue;
+      }
       return {
         error: `Parameter (${key}) type need ${schema[key].type}`
       };
@@ -236,6 +239,8 @@ var allowed = (params, schema) => {
           ", "
         )}), but got ${params[key]}`
       };
+    } else if (schema[key].nullable && params[key] === null) {
+      continue;
     } else if (schema[key].type === "string" && typeof params[key] !== "string") {
       return {
         error: `Parameter (${key}) type need string, but got ${params[key]}`

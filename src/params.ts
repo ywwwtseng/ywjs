@@ -24,6 +24,9 @@ export const validate = (
       schema[key].type !== 'enum' &&
       typeof params[key] !== schema[key].type
     ) {
+      if (schema[key].nullable && params[key] === null) {
+        continue;
+      }
       return {
         error: `Parameter (${key}) type need ${schema[key].type}`,
       };
@@ -105,6 +108,8 @@ export const allowed = (
           ', '
         )}), but got ${params[key]}`,
       };
+    } else if (schema[key].nullable && params[key] === null) {
+      continue;
     } else if (
       schema[key].type === 'string' &&
       typeof params[key] !== 'string'
