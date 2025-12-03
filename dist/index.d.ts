@@ -19,17 +19,21 @@ declare const ErrorCodes: {
     readonly INVALID_TOKEN: 40103;
     readonly EXPIRED_TOKEN: 40104;
     readonly INVALID_SIGNATURE: 40105;
-    readonly INSUFFICIENT_PERMISSIONS: 40301;
-    readonly COMING_SOON: 40302;
-    readonly SYSTEM_MAINTENANCE: 40303;
-    readonly BLACKLIST_USER: 40304;
-    readonly WITHDRAWAL_RESTRICTION: 40305;
+    readonly FORBIDDEN: 40301;
+    readonly INSUFFICIENT_PERMISSIONS: 40302;
+    readonly COMING_SOON: 40303;
+    readonly SYSTEM_MAINTENANCE: 40304;
+    readonly BLACKLIST_USER: 40305;
+    readonly WITHDRAWAL_RESTRICTION: 40306;
     readonly NOT_FOUND: 40401;
     readonly ALREADY_EXISTED: 40901;
     readonly INSUFFICIENT: 40902;
     readonly NOT_SUPPORT: 40903;
     readonly MANY_REQUESTS: 40904;
     readonly INTERNAL_SERVER_ERROR: 50001;
+    readonly NOT_IMPLEMENTED: 50101;
+    readonly BAD_GATEWAY: 50201;
+    readonly SERVICE_UNAVAILABLE: 50301;
 };
 declare class AppError extends Error {
     readonly status: number;

@@ -82,11 +82,12 @@ var ErrorCodes = {
   EXPIRED_TOKEN: 40104,
   INVALID_SIGNATURE: 40105,
   // 403xx - Authorization Errors
-  INSUFFICIENT_PERMISSIONS: 40301,
-  COMING_SOON: 40302,
-  SYSTEM_MAINTENANCE: 40303,
-  BLACKLIST_USER: 40304,
-  WITHDRAWAL_RESTRICTION: 40305,
+  FORBIDDEN: 40301,
+  INSUFFICIENT_PERMISSIONS: 40302,
+  COMING_SOON: 40303,
+  SYSTEM_MAINTENANCE: 40304,
+  BLACKLIST_USER: 40305,
+  WITHDRAWAL_RESTRICTION: 40306,
   // 404xx - Not Found Errors
   NOT_FOUND: 40401,
   // 409xx - Conflict Errors
@@ -97,7 +98,14 @@ var ErrorCodes = {
   NOT_SUPPORT: 40903,
   MANY_REQUESTS: 40904,
   // 500xx - Internal Server Errors
-  INTERNAL_SERVER_ERROR: 50001
+  INTERNAL_SERVER_ERROR: 50001,
+  // 501xx - Not Implemented Errors
+  NOT_IMPLEMENTED: 50101,
+  // 502xx - Bad Gateway Errors
+  BAD_GATEWAY: 50201,
+  // 503xx - Service Unavailable Errors
+  SERVICE_UNAVAILABLE: 50301
+  // 504xx - Gateway Timeout Errors
 };
 var AppError = class extends Error {
   constructor(code, message, info, status = Math.floor(code / 100)) {
