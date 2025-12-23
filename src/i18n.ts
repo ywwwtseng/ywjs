@@ -1,6 +1,8 @@
 import { get } from './object';
 
-export type Locale = Record<string, Record<string, string>>;
+export interface Locale {
+  [key: string]: string | Locale;
+}
 
 export type Locales = Record<string, Locale>;
 

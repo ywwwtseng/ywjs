@@ -84,7 +84,9 @@ interface ErrorResponse {
 }
 declare const errorToResponse: (error: unknown) => Response;
 
-type Locale = Record<string, Record<string, string>>;
+interface Locale {
+    [key: string]: string | Locale;
+}
 type Locales = Record<string, Locale>;
 declare function getLocale(locales: Locales, lang: string, callback?: Locale): Locale;
 declare function translate(locale: Locale, key: string, params?: Record<string, string | number>): any;
