@@ -93,4 +93,14 @@ declare function translate(locale: Locale, key: string, params?: Record<string, 
 
 declare function loadImage(url: string): Promise<Blob | null>;
 
-export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, loadImage, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };
+declare class InMemoryCache {
+    static instance: InMemoryCache;
+    private data;
+    static getInstance(): InMemoryCache;
+    get<T>(key: string): T | null;
+    set(key: string, value: unknown, ttl?: number): void;
+    delete(key: string): void;
+    clear(): void;
+}
+
+export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, InMemoryCache, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, loadImage, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };

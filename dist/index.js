@@ -309,9 +309,51 @@ async function loadImage(url) {
     return null;
   }
 }
+
+// src/InMemoryCache.ts
+var InMemoryCache = class _InMemoryCache {
+  static instance;
+  data = {};
+  static getInstance() {
+    if (!_InMemoryCache.instance) {
+      _InMemoryCache.instance = new _InMemoryCache();
+    }
+    return _InMemoryCache.instance;
+  }
+  get(key) {
+    if (!this.data[key]) {
+      return null;
+    }
+    const expiresAt = this.data[key].expiresAt;
+    if (expiresAt && expiresAt < Date.now()) {
+      this.delete(key);
+      return null;
+    }
+    return this.data[key].value;
+  }
+  set(key, value, ttl) {
+    if (ttl) {
+      this.data[key] = {
+        expiresAt: Date.now() + ttl,
+        value
+      };
+    } else {
+      this.data[key] = {
+        value
+      };
+    }
+  }
+  delete(key) {
+    delete this.data[key];
+  }
+  clear() {
+    this.data = {};
+  }
+};
 export {
   AppError,
   ErrorCodes,
+  InMemoryCache,
   allowed,
   errorToResponse,
   get,
