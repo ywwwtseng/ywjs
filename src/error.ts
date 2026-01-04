@@ -2,6 +2,7 @@ export const ErrorCodes = {
   // 400xx - Bad Request Errors
   INVALID_PARAMS: 40001,
   // 401xx - Authentication Errors
+  UNAUTHORIZED: 40100,
   SESSION_MISMATCH: 40101,
   SESSION_EXPIRED: 40102,
   INVALID_TOKEN: 40103,

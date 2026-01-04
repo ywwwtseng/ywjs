@@ -14,6 +14,7 @@ type DeepPartial<T> = T extends object ? {
 
 declare const ErrorCodes: {
     readonly INVALID_PARAMS: 40001;
+    readonly UNAUTHORIZED: 40100;
     readonly SESSION_MISMATCH: 40101;
     readonly SESSION_EXPIRED: 40102;
     readonly INVALID_TOKEN: 40103;
