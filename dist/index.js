@@ -351,10 +351,28 @@ var InMemoryCache = class _InMemoryCache {
     this.data = {};
   }
 };
+
+// src/constants.ts
+var Role = /* @__PURE__ */ ((Role2) => {
+  Role2["ROOT"] = "root";
+  Role2["ADMIN"] = "admin";
+  Role2["OPERATOR"] = "operator";
+  Role2["VIEWER"] = "viewer";
+  Role2["WALLET"] = "wallet";
+  Role2["USER_TG"] = "user:tg";
+  Role2["USER_WEB"] = "user:web";
+  Role2["USER_WEB3"] = "user:web3";
+  Role2["USER_APP"] = "user:app";
+  Role2["USER_TEST"] = "user:test";
+  Role2["USER_BOT"] = "user:bot";
+  Role2["USER_GUEST"] = "user:guest";
+  return Role2;
+})(Role || {});
 export {
   AppError,
   ErrorCodes,
   InMemoryCache,
+  Role,
   allowed,
   errorToResponse,
   get,

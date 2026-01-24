@@ -8,10 +8,6 @@ declare const parseJSON: (src: unknown) => unknown;
 
 declare const sleep: (ms: number) => Promise<unknown>;
 
-type DeepPartial<T> = T extends object ? {
-    [K in keyof T]?: DeepPartial<T[K]>;
-} : T;
-
 declare const ErrorCodes: {
     readonly INVALID_PARAMS: 40001;
     readonly UNAUTHORIZED: 40100;
@@ -104,4 +100,83 @@ declare class InMemoryCache {
     clear(): void;
 }
 
-export { AppError, type DeepPartial, ErrorCodes, type ErrorResponse, InMemoryCache, type Locale, type Locales, allowed, errorToResponse, get, getLocale, ip, isObject, loadImage, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };
+declare enum Role {
+    ROOT = "root",
+    ADMIN = "admin",
+    OPERATOR = "operator",
+    VIEWER = "viewer",
+    WALLET = "wallet",
+    USER_TG = "user:tg",
+    USER_WEB = "user:web",
+    USER_WEB3 = "user:web3",
+    USER_APP = "user:app",
+    USER_TEST = "user:test",
+    USER_BOT = "user:bot",
+    USER_GUEST = "user:guest"
+}
+
+interface AuthContext {
+    jwtSecret: string;
+    appName: string;
+    role: (address: string) => Promise<Role>;
+}
+type QueryParams = Record<string, string | number | boolean>;
+interface MutateBody<T = Record<string, unknown>> {
+    type: 'mutate';
+    action: string;
+    payload?: T;
+}
+interface QueryBody {
+    type: 'query';
+    key: string;
+    path: string;
+    params: QueryParams;
+}
+type ApiRequestBody = MutateBody | QueryBody;
+interface Command {
+    type: 'update' | 'merge' | 'replace' | 'unshift' | 'push' | 'delete';
+    target?: string;
+    payload: unknown;
+}
+interface Notify {
+    type?: 'success' | 'error' | 'default';
+    message: string;
+}
+interface ResponseData<T = unknown> {
+    error?: number;
+    message?: string;
+    commands?: Command[];
+    data?: T;
+    notify?: Notify;
+    navigate?: {
+        screen: string;
+        params?: Record<string, string | number | boolean | null>;
+    };
+    ok?: boolean;
+}
+interface QueryContext {
+    headers: Headers;
+    user: {
+        id: string;
+    } & Record<string, unknown>;
+    start_param: string | null;
+}
+interface MutationContext {
+    name: string;
+    headers: Headers;
+    user: {
+        id: string;
+    } & Record<string, unknown>;
+    start_param: string | null;
+}
+type Mutation<T = MutateBody['payload']> = (body: T, context: MutationContext) => Promise<ResponseData>;
+type MutationValidate<T = MutateBody['payload']> = (body: T, context: MutationContext) => Promise<boolean>;
+type Query = (body: QueryBody, context: QueryContext) => Promise<ResponseData>;
+type Queries = Record<string, Query>;
+type MutationValidators = Record<string, MutationValidate>;
+type Mutations = Record<string, Mutation<unknown>>;
+type DeepPartial<T> = T extends object ? {
+    [K in keyof T]?: DeepPartial<T[K]>;
+} : T;
+
+export { type ApiRequestBody, AppError, type AuthContext, type Command, type DeepPartial, ErrorCodes, type ErrorResponse, InMemoryCache, type Locale, type Locales, type MutateBody, type Mutation, type MutationContext, type MutationValidate, type MutationValidators, type Mutations, type Notify, type Queries, type Query, type QueryBody, type QueryContext, type QueryParams, type ResponseData, Role, allowed, errorToResponse, get, getLocale, ip, isObject, loadImage, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };
