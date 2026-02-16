@@ -197,7 +197,12 @@ var validate = (params, schema) => {
       return {
         error: `Parameter (${key}) is required`
       };
-    } else if (!(schema[key].nullable && params[key] === null) && !(!schema[key].required && params[key] === void 0) && schema[key].type !== "enum" && typeof params[key] !== schema[key].type) {
+    } else if (Object.prototype.hasOwnProperty.call(params, key) && params[key] === void 0) {
+      return {
+        error: `Parameter (${key}) cannot be undefined`
+      };
+    } else if (!(schema[key].nullable && params[key] === null) && schema[key].type !== "enum" && // type check：email 視為 string
+    (schema[key].type === "email" && typeof params[key] !== "string" || schema[key].type !== "email" && typeof params[key] !== schema[key].type)) {
       if (schema[key].nullable && params[key] === null) {
         continue;
       }
@@ -223,6 +228,37 @@ var validate = (params, schema) => {
         return {
           error: `Parameter (${key}) type need boolean, but got ${params[key]}`
         };
+      } else if (schema[key].type === "email" && typeof params[key] === "string") {
+        const value = params[key].trim();
+        if (value === "") {
+          return {
+            error: `Parameter (${key}) can't be empty email`
+          };
+        }
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(value)) {
+          return {
+            error: `Parameter (${key}) is not a valid email`
+          };
+        }
+      }
+    }
+    const def = schema[key];
+    if ((def.type === "string" || def.type === "email") && typeof params[key] === "string") {
+      const len = params[key].length;
+      if (def.min !== void 0 && len < def.min) {
+        return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
+      }
+      if (def.max !== void 0 && len > def.max) {
+        return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+    } else if (def.type === "number" && typeof params[key] === "number") {
+      const val = params[key];
+      if (def.min !== void 0 && val < def.min) {
+        return { error: `Parameter (${key}) must be >= ${def.min}, got ${val}` };
+      }
+      if (def.max !== void 0 && val > def.max) {
+        return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
       }
     }
   }
@@ -238,7 +274,12 @@ var allowed = (params, schema) => {
       return {
         error: `Parameter (${key}) is not allowed`
       };
-    } else if (!(schema[key].nullable && params[key] === null) && schema[key].type !== "enum" && typeof params[key] !== schema[key].type) {
+    } else if (params[key] === void 0) {
+      return {
+        error: `Parameter (${key}) cannot be undefined`
+      };
+    } else if (!(schema[key].nullable && params[key] === null) && schema[key].type !== "enum" && // type check：email 視為 string
+    (schema[key].type === "email" && typeof params[key] !== "string" || schema[key].type !== "email" && typeof params[key] !== schema[key].type)) {
       return {
         error: `Parameter (${key}) type need ${schema[key].type}`
       };
@@ -262,6 +303,37 @@ var allowed = (params, schema) => {
       return {
         error: `Parameter (${key}) type need boolean, but got ${params[key]}`
       };
+    } else if (schema[key].type === "email" && typeof params[key] === "string") {
+      const value = params[key].trim();
+      if (value === "") {
+        return {
+          error: `Parameter (${key}) can't be empty email`
+        };
+      }
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(value)) {
+        return {
+          error: `Parameter (${key}) is not a valid email`
+        };
+      }
+    }
+    const def = schema[key];
+    if ((def.type === "string" || def.type === "email") && typeof params[key] === "string") {
+      const len = params[key].length;
+      if (def.min !== void 0 && len < def.min) {
+        return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
+      }
+      if (def.max !== void 0 && len > def.max) {
+        return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+    } else if (def.type === "number" && typeof params[key] === "number") {
+      const val = params[key];
+      if (def.min !== void 0 && val < def.min) {
+        return { error: `Parameter (${key}) must be >= ${def.min}, got ${val}` };
+      }
+      if (def.max !== void 0 && val > def.max) {
+        return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
+      }
     }
   }
   return {

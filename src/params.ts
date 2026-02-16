@@ -3,10 +3,12 @@ export const validate = (
   schema: Record<
     string,
     {
-      type: 'string' | 'number' | 'boolean' | 'enum';
+      type: 'string' | 'number' | 'boolean' | 'enum' | 'email';
       enum?: string[];
       nullable?: boolean;
       required?: boolean;
+      min?: number;
+      max?: number;
     }
   >
 ) => {
@@ -18,11 +20,17 @@ export const validate = (
       return {
         error: `Parameter (${key}) is required`,
       };
+    } else if (Object.prototype.hasOwnProperty.call(params, key) && params[key] === undefined) {
+      return {
+        error: `Parameter (${key}) cannot be undefined`,
+      };
     } else if (
       !(schema[key].nullable && params[key] === null) &&
-      !(!schema[key].required && params[key] === undefined) &&
       schema[key].type !== 'enum' &&
-      typeof params[key] !== schema[key].type
+      // type check：email 視為 string
+      ((schema[key].type === 'email' && typeof params[key] !== 'string') ||
+        (schema[key].type !== 'email' &&
+          typeof params[key] !== schema[key].type))
     ) {
       if (schema[key].nullable && params[key] === null) {
         continue;
@@ -63,6 +71,45 @@ export const validate = (
         return {
           error: `Parameter (${key}) type need boolean, but got ${params[key]}`,
         };
+      } else if (
+        schema[key].type === 'email' &&
+        typeof params[key] === 'string'
+      ) {
+        const value = (params[key] as string).trim();
+        if (value === '') {
+          return {
+            error: `Parameter (${key}) can't be empty email`,
+          };
+        }
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(value)) {
+          return {
+            error: `Parameter (${key}) is not a valid email`,
+          };
+        }
+      }
+    }
+
+    // min/max for string (length) and number (value)
+    const def = schema[key];
+    if (
+      (def.type === 'string' || def.type === 'email') &&
+      typeof params[key] === 'string'
+    ) {
+      const len = (params[key] as string).length;
+      if (def.min !== undefined && len < def.min) {
+        return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
+      }
+      if (def.max !== undefined && len > def.max) {
+        return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+    } else if (def.type === 'number' && typeof params[key] === 'number') {
+      const val = params[key] as number;
+      if (def.min !== undefined && val < def.min) {
+        return { error: `Parameter (${key}) must be >= ${def.min}, got ${val}` };
+      }
+      if (def.max !== undefined && val > def.max) {
+        return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
       }
     }
   }
@@ -77,9 +124,11 @@ export const allowed = (
   schema: Record<
     string,
     {
-      type: 'string' | 'number' | 'boolean' | 'enum';
+      type: 'string' | 'number' | 'boolean' | 'enum' | 'email';
       enum?: string[];
       nullable?: boolean;
+      min?: number;
+      max?: number;
     }
   >
 ) => {
@@ -91,10 +140,17 @@ export const allowed = (
       return {
         error: `Parameter (${key}) is not allowed`,
       };
+    } else if (params[key] === undefined) {
+      return {
+        error: `Parameter (${key}) cannot be undefined`,
+      };
     } else if (
       !(schema[key].nullable && params[key] === null) &&
       schema[key].type !== 'enum' &&
-      typeof params[key] !== schema[key].type
+      // type check：email 視為 string
+      ((schema[key].type === 'email' && typeof params[key] !== 'string') ||
+        (schema[key].type !== 'email' &&
+          typeof params[key] !== schema[key].type))
     ) {
       return {
         error: `Parameter (${key}) type need ${schema[key].type}`,
@@ -131,6 +187,45 @@ export const allowed = (
       return {
         error: `Parameter (${key}) type need boolean, but got ${params[key]}`,
       };
+    } else if (
+      schema[key].type === 'email' &&
+      typeof params[key] === 'string'
+    ) {
+      const value = (params[key] as string).trim();
+      if (value === '') {
+        return {
+          error: `Parameter (${key}) can't be empty email`,
+        };
+      }
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(value)) {
+        return {
+          error: `Parameter (${key}) is not a valid email`,
+        };
+      }
+    }
+
+    // min/max for string (length) and number (value)
+    const def = schema[key];
+    if (
+      (def.type === 'string' || def.type === 'email') &&
+      typeof params[key] === 'string'
+    ) {
+      const len = (params[key] as string).length;
+      if (def.min !== undefined && len < def.min) {
+        return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
+      }
+      if (def.max !== undefined && len > def.max) {
+        return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+    } else if (def.type === 'number' && typeof params[key] === 'number') {
+      const val = params[key] as number;
+      if (def.min !== undefined && val < def.min) {
+        return { error: `Parameter (${key}) must be >= ${def.min}, got ${val}` };
+      }
+      if (def.max !== undefined && val > def.max) {
+        return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
+      }
     }
   }
 
