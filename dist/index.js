@@ -284,9 +284,17 @@ var errorToResponse = (error) => {
 };
 
 // src/i18n.ts
-function getLocale(locales, lang, callback) {
-  lang = lang.slice(0, 2);
-  return locales[lang] || callback;
+function getLocale(locales, locale_code, callback) {
+  const locale = locales[locale_code];
+  if (locale) {
+    return locale;
+  }
+  for (const key in locales) {
+    if (key.slice(0, 2) === locale_code.slice(0, 2)) {
+      return locales[key];
+    }
+  }
+  return callback;
 }
 function translate(locale, key, params) {
   if (!locale || typeof key !== "string") return key;

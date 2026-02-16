@@ -6,9 +6,20 @@ export interface Locale {
 
 export type Locales = Record<string, Locale>;
 
-export function getLocale(locales: Locales, lang: string, callback?: Locale) {
-  lang = lang.slice(0, 2);
-  return locales[lang] || callback;
+export function getLocale(locales: Locales, locale_code: string, callback: Locale) {
+  const locale = locales[locale_code];
+
+  if (locale) {
+    return locale;
+  }
+
+  for (const key in locales) {
+    if (key.slice(0, 2) === locale_code.slice(0, 2)) {
+      return locales[key];
+    }
+  }
+
+  return callback;
 }
 
 export function translate(

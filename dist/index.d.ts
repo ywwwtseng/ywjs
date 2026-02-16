@@ -85,7 +85,7 @@ interface Locale {
     [key: string]: string | Locale;
 }
 type Locales = Record<string, Locale>;
-declare function getLocale(locales: Locales, lang: string, callback?: Locale): Locale;
+declare function getLocale(locales: Locales, locale_code: string, callback: Locale): Locale;
 declare function translate(locale: Locale, key: string, params?: Record<string, string | number>): any;
 
 declare function loadImage(url: string): Promise<Blob | null>;
