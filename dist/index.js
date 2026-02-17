@@ -245,12 +245,16 @@ var validate = (params, schema) => {
     }
     const def = schema[key];
     if ((def.type === "string" || def.type === "email") && typeof params[key] === "string") {
-      const len = params[key].length;
+      const str = params[key];
+      const len = str.length;
       if (def.min !== void 0 && len < def.min) {
         return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
       }
       if (def.max !== void 0 && len > def.max) {
         return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+      if (def.type === "string" && def.pattern !== void 0 && !def.pattern.test(str)) {
+        return { error: `Parameter (${key}) does not match pattern` };
       }
     } else if (def.type === "number" && typeof params[key] === "number") {
       const val = params[key];
@@ -259,6 +263,12 @@ var validate = (params, schema) => {
       }
       if (def.max !== void 0 && val > def.max) {
         return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
+      }
+    }
+    if (def.validator) {
+      const err = def.validator(params[key], key);
+      if (err != null && err !== "") {
+        return { error: err };
       }
     }
   }
@@ -274,7 +284,9 @@ var allowed = (params, schema) => {
       return {
         error: `Parameter (${key}) is not allowed`
       };
-    } else if (params[key] === void 0) {
+    }
+    const def = schema[key];
+    if (params[key] === void 0) {
       return {
         error: `Parameter (${key}) cannot be undefined`
       };
@@ -317,14 +329,17 @@ var allowed = (params, schema) => {
         };
       }
     }
-    const def = schema[key];
     if ((def.type === "string" || def.type === "email") && typeof params[key] === "string") {
-      const len = params[key].length;
+      const str = params[key];
+      const len = str.length;
       if (def.min !== void 0 && len < def.min) {
         return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
       }
       if (def.max !== void 0 && len > def.max) {
         return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+      if (def.type === "string" && def.pattern !== void 0 && !def.pattern.test(str)) {
+        return { error: `Parameter (${key}) does not match pattern` };
       }
     } else if (def.type === "number" && typeof params[key] === "number") {
       const val = params[key];
@@ -333,6 +348,12 @@ var allowed = (params, schema) => {
       }
       if (def.max !== void 0 && val > def.max) {
         return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
+      }
+    }
+    if (def.validator) {
+      const err = def.validator(params[key], key);
+      if (err != null && err !== "") {
+        return { error: err };
       }
     }
   }

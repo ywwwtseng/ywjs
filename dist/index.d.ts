@@ -57,23 +57,22 @@ interface RetryOptions {
 }
 declare const retry: ({ retries, delay }: RetryOptions) => <F extends () => Promise<Awaited<ReturnType<F>>>>(exec: F) => Promise<[Awaited<ReturnType<F>> | undefined, unknown]>;
 
-declare const validate: (params: Record<string, unknown>, schema: Record<string, {
-    type: "string" | "number" | "boolean" | "enum" | "email";
+/** 回傳錯誤訊息表示驗證失敗，回傳 null 或 undefined 表示通過 */
+type Validator = (value: unknown, key: string) => string | null | undefined;
+type SchemaEntry = {
+    type: 'string' | 'number' | 'boolean' | 'enum' | 'email';
     enum?: string[];
     nullable?: boolean;
     required?: boolean;
     min?: number;
     max?: number;
-}>) => {
+    pattern?: RegExp;
+    validator?: Validator;
+};
+declare const validate: (params: Record<string, unknown>, schema: Record<string, SchemaEntry>) => {
     error: string;
 };
-declare const allowed: (params: Record<string, unknown>, schema: Record<string, {
-    type: "string" | "number" | "boolean" | "enum" | "email";
-    enum?: string[];
-    nullable?: boolean;
-    min?: number;
-    max?: number;
-}>) => {
+declare const allowed: (params: Record<string, unknown>, schema: Record<string, SchemaEntry>) => {
     error: string;
 };
 
@@ -183,4 +182,4 @@ type DeepPartial<T> = T extends object ? {
     [K in keyof T]?: DeepPartial<T[K]>;
 } : T;
 
-export { type ApiRequestBody, AppError, type AuthContext, type Command, type DeepPartial, ErrorCodes, type ErrorResponse, InMemoryCache, type Locale, type Locales, type MutateBody, type Mutation, type MutationContext, type MutationValidate, type MutationValidators, type Mutations, type Notify, type Queries, type Query, type QueryBody, type QueryContext, type QueryParams, type ResponseData, Role, allowed, errorToResponse, get, getLocale, ip, isObject, loadImage, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };
+export { type ApiRequestBody, AppError, type AuthContext, type Command, type DeepPartial, ErrorCodes, type ErrorResponse, InMemoryCache, type Locale, type Locales, type MutateBody, type Mutation, type MutationContext, type MutationValidate, type MutationValidators, type Mutations, type Notify, type Queries, type Query, type QueryBody, type QueryContext, type QueryParams, type ResponseData, Role, type Validator, allowed, errorToResponse, get, getLocale, ip, isObject, loadImage, merge, parseError, parseJSON, prune, retry, sleep, translate, update, validate };

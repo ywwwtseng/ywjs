@@ -1,17 +1,20 @@
+/** 回傳錯誤訊息表示驗證失敗，回傳 null 或 undefined 表示通過 */
+export type Validator = (value: unknown, key: string) => string | null | undefined;
+
+type SchemaEntry = {
+  type: 'string' | 'number' | 'boolean' | 'enum' | 'email';
+  enum?: string[];
+  nullable?: boolean;
+  required?: boolean;
+  min?: number;
+  max?: number;
+  pattern?: RegExp;
+  validator?: Validator;
+};
+
 export const validate = (
   params: Record<string, unknown>,
-  schema: Record<
-    string,
-    {
-      type: 'string' | 'number' | 'boolean' | 'enum' | 'email';
-      enum?: string[];
-      nullable?: boolean;
-      required?: boolean;
-      min?: number;
-      max?: number;
-      pattern?: RegExp;
-    }
-  >
+  schema: Record<string, SchemaEntry>
 ) => {
   const keys = Object.keys(schema);
   for (let index = 0; index < keys.length; index++) {
@@ -117,6 +120,13 @@ export const validate = (
         return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
       }
     }
+
+    if (def.validator) {
+      const err = def.validator(params[key], key);
+      if (err != null && err !== '') {
+        return { error: err };
+      }
+    }
   }
 
   return {
@@ -126,17 +136,7 @@ export const validate = (
 
 export const allowed = (
   params: Record<string, unknown>,
-  schema: Record<
-    string,
-    {
-      type: 'string' | 'number' | 'boolean' | 'enum' | 'email';
-      enum?: string[];
-      nullable?: boolean;
-      min?: number;
-      max?: number;
-      pattern?: RegExp;
-    }
-  >
+  schema: Record<string, SchemaEntry>
 ) => {
   const keys = Object.keys(params);
   for (let index = 0; index < keys.length; index++) {
@@ -146,7 +146,9 @@ export const allowed = (
       return {
         error: `Parameter (${key}) is not allowed`,
       };
-    } else if (params[key] === undefined) {
+    }
+    const def = schema[key];
+    if (params[key] === undefined) {
       return {
         error: `Parameter (${key}) cannot be undefined`,
       };
@@ -212,7 +214,6 @@ export const allowed = (
     }
 
     // min/max for string (length) and number (value)
-    const def = schema[key];
     if (
       (def.type === 'string' || def.type === 'email') &&
       typeof params[key] === 'string'
@@ -235,6 +236,13 @@ export const allowed = (
       }
       if (def.max !== undefined && val > def.max) {
         return { error: `Parameter (${key}) must be <= ${def.max}, got ${val}` };
+      }
+    }
+
+    if (def.validator) {
+      const err = def.validator(params[key], key);
+      if (err != null && err !== '') {
+        return { error: err };
       }
     }
   }

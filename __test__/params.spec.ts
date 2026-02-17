@@ -90,6 +90,63 @@ describe('params', () => {
     );
   });
 
+  test('uses custom message (validate)', () => {
+    const params = {};
+
+    const schema = {
+      name: {
+        type: 'string' as const,
+        required: true,
+        message: '請輸入姓名',
+      },
+    };
+
+    expect(validate(params, schema).error).toBe('請輸入姓名');
+  });
+
+  test('uses custom message for pattern (validate)', () => {
+    const params = { code: 'invalid' };
+
+    const schema = {
+      code: {
+        type: 'string' as const,
+        required: true,
+        pattern: /^[A-Z]{2,4}$/,
+        message: '代碼須為 2～4 個大寫英文',
+      },
+    };
+
+    expect(validate(params, schema).error).toBe('代碼須為 2～4 個大寫英文');
+  });
+
+  test('custom validator passes (validate)', () => {
+    const params = { score: 50 };
+
+    const schema = {
+      score: {
+        type: 'number' as const,
+        required: true,
+        validator: (v: unknown) => (typeof v === 'number' && v >= 0 && v <= 100 ? null : '分數須在 0～100'),
+      },
+    };
+
+    expect(validate(params, schema)).toEqual({ error: null });
+  });
+
+  test('custom validator fails (validate)', () => {
+    const params = { score: 150 };
+
+    const schema = {
+      score: {
+        type: 'number' as const,
+        required: true,
+        validator: (v: unknown) => (typeof v === 'number' && v >= 0 && v <= 100 ? null : '分數須在 0～100'),
+      },
+    };
+
+    expect(validate(params, schema).error).toBe('分數須在 0～100');
+  });
+
   test('fails when below min length / value', () => {
     const params = {
       username: 'ab',
@@ -290,5 +347,46 @@ describe('params', () => {
     expect(allowed(params, schema).error).toBe(
       'Parameter (nickname) cannot be undefined'
     );
+  });
+
+  test('uses custom message (allowed)', () => {
+    const params = { email: 'bad' };
+
+    const schema = {
+      email: {
+        type: 'email' as const,
+        message: '請填寫正確的 Email',
+      },
+    };
+
+    expect(allowed(params, schema).error).toBe('請填寫正確的 Email');
+  });
+
+  test('custom validator (allowed)', () => {
+    const params = { id: 'abc' };
+
+    const schema = {
+      id: {
+        type: 'string' as const,
+        validator: (v: unknown, key: string) =>
+          typeof v === 'string' && /^[a-z0-9-]+$/.test(v) ? null : `${key} 須為小寫英文、數字或連字號`,
+      },
+    };
+
+    expect(allowed(params, schema)).toEqual({ error: null });
+  });
+
+  test('custom validator fails (allowed)', () => {
+    const params = { id: 'Invalid_ID' };
+
+    const schema = {
+      id: {
+        type: 'string' as const,
+        validator: (v: unknown, key: string) =>
+          typeof v === 'string' && /^[a-z0-9-]+$/.test(v) ? null : `${key} 須為小寫英文、數字或連字號`,
+      },
+    };
+
+    expect(allowed(params, schema).error).toBe('id 須為小寫英文、數字或連字號');
   });
 });
