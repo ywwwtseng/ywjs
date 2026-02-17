@@ -9,6 +9,7 @@ export const validate = (
       required?: boolean;
       min?: number;
       max?: number;
+      pattern?: RegExp;
     }
   >
 ) => {
@@ -96,12 +97,16 @@ export const validate = (
       (def.type === 'string' || def.type === 'email') &&
       typeof params[key] === 'string'
     ) {
-      const len = (params[key] as string).length;
+      const str = params[key] as string;
+      const len = str.length;
       if (def.min !== undefined && len < def.min) {
         return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
       }
       if (def.max !== undefined && len > def.max) {
         return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+      if (def.type === 'string' && def.pattern !== undefined && !def.pattern.test(str)) {
+        return { error: `Parameter (${key}) does not match pattern` };
       }
     } else if (def.type === 'number' && typeof params[key] === 'number') {
       const val = params[key] as number;
@@ -129,6 +134,7 @@ export const allowed = (
       nullable?: boolean;
       min?: number;
       max?: number;
+      pattern?: RegExp;
     }
   >
 ) => {
@@ -211,12 +217,16 @@ export const allowed = (
       (def.type === 'string' || def.type === 'email') &&
       typeof params[key] === 'string'
     ) {
-      const len = (params[key] as string).length;
+      const str = params[key] as string;
+      const len = str.length;
       if (def.min !== undefined && len < def.min) {
         return { error: `Parameter (${key}) length must be >= ${def.min}, got ${len}` };
       }
       if (def.max !== undefined && len > def.max) {
         return { error: `Parameter (${key}) length must be <= ${def.max}, got ${len}` };
+      }
+      if (def.type === 'string' && def.pattern !== undefined && !def.pattern.test(str)) {
+        return { error: `Parameter (${key}) does not match pattern` };
       }
     } else if (def.type === 'number' && typeof params[key] === 'number') {
       const val = params[key] as number;

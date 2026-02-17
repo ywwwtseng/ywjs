@@ -56,6 +56,40 @@ describe('params', () => {
     );
   });
 
+  test('passes when string matches pattern (url)', () => {
+    const params = {
+      url: 'https://example.com/path',
+    };
+
+    const schema = {
+      url: {
+        type: 'string' as const,
+        required: true,
+        pattern: /^https?:\/\/.+\..+/,
+      },
+    };
+
+    expect(validate(params, schema)).toEqual({ error: null });
+  });
+
+  test('fails when string does not match pattern (url)', () => {
+    const params = {
+      url: 'not-a-url',
+    };
+
+    const schema = {
+      url: {
+        type: 'string' as const,
+        required: true,
+        pattern: /^https?:\/\/.+\..+/,
+      },
+    };
+
+    expect(validate(params, schema).error).toBe(
+      'Parameter (url) does not match pattern'
+    );
+  });
+
   test('fails when below min length / value', () => {
     const params = {
       username: 'ab',
@@ -155,6 +189,38 @@ describe('params', () => {
     };
 
     expect(allowed(params, schema)).toEqual({ error: null });
+  });
+
+  test('passes when url matches pattern (allowed)', () => {
+    const params = {
+      homepage: 'https://example.org',
+    };
+
+    const schema = {
+      homepage: {
+        type: 'string' as const,
+        pattern: /^https?:\/\/.+\..+/,
+      },
+    };
+
+    expect(allowed(params, schema)).toEqual({ error: null });
+  });
+
+  test('fails when url does not match pattern (allowed)', () => {
+    const params = {
+      homepage: 'ftp://invalid',
+    };
+
+    const schema = {
+      homepage: {
+        type: 'string' as const,
+        pattern: /^https?:\/\/.+\..+/,
+      },
+    };
+
+    expect(allowed(params, schema).error).toBe(
+      'Parameter (homepage) does not match pattern'
+    );
   });
 
   test('fails when there is an extra param not in schema', () => {
